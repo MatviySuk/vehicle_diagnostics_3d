@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../vehicle/logic/vehicle_providers.dart';
+import '../../auth/logic/auth_providers.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -30,9 +31,19 @@ class DashboardScreen extends ConsumerWidget {
             onPressed: () async {
               final result = await context.push<String>('/scanner');
               if (result != null && context.mounted) {
-                // Instantly jump to Agostinho's 3D component detail page when a QR code is scanned!
                 context.push('/component/$result');
               }
+            },
+          ),
+
+          // ING: Logout button — clears the session and returns to the welcome screen.
+          // PT: Botão de logout — limpa a sessão e regressa ao ecrã de boas-vindas.
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+            onPressed: () async {
+              await ref.read(authNotifierProvider.notifier).logout();
+              if (context.mounted) context.go('/welcome');
             },
           ),
         ],
