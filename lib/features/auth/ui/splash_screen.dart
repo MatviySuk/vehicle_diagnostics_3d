@@ -33,15 +33,69 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Vehicle Diagnostics 3D'),
-            SizedBox(height: 24),
-            CircularProgressIndicator(),
-          ],
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF0A1628), Color(0xFF060E1A)],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              const Spacer(),
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.blue.withAlpha(38),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.withAlpha(76),
+                      blurRadius: 48,
+                      spreadRadius: 12,
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.directions_car,
+                  size: 64,
+                  color: Colors.blue,
+                ),
+              ),
+              const SizedBox(height: 32),
+              const Text(
+                'Vehicle Diagnostics',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                '3 D',
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w300,
+                  letterSpacing: 8,
+                ),
+              ),
+              const Spacer(),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 56),
+                child: CircularProgressIndicator(
+                  color: Colors.blue,
+                  strokeWidth: 2,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
