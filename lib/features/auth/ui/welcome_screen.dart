@@ -72,10 +72,11 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   Widget build(BuildContext context) {
     if (_isScannerOpen) {
       return Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF0A1628),
-          foregroundColor: Colors.white,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black87,
+          elevation: 0,
           title: const Text('Scan QR Code'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -90,7 +91,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 width: 240,
                 height: 240,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2.5),
+                  border: Border.all(color: Colors.pink, width: 2.5),
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
@@ -99,7 +100,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               const ColoredBox(
                 color: Colors.black54,
                 child: Center(
-                  child: CircularProgressIndicator(color: Colors.blue),
+                  child: CircularProgressIndicator(color: Colors.pink),
                 ),
               ),
           ],
@@ -108,115 +109,139 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     }
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF0A1628), Color(0xFF060E1A)],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Spacer(flex: 2),
-                Align(
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.blue.withAlpha(38),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blue.withAlpha(64),
-                          blurRadius: 32,
-                          spreadRadius: 6,
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.directions_car,
-                      size: 52,
-                      color: Colors.blue,
-                    ),
-                  ),
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          Positioned(
+            top: -120,
+            left: -120,
+            child: Container(
+              width: 420,
+              height: 420,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [Colors.pink.withAlpha(90), Colors.transparent],
                 ),
-                const SizedBox(height: 28),
-                const Text(
-                  'Vehicle Diagnostics 3D',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Sign in to access your vehicle data',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white.withAlpha(128),
-                    fontSize: 14,
-                  ),
-                ),
-                const Spacer(flex: 3),
-                FilledButton.icon(
-                  onPressed: _isLoading ? null : _openScanner,
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: const Text('Sign in with QR Code'),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    textStyle: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: _isLoading ? null : _generateNewSession,
-                  icon: _isLoading
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.blue,
-                          ),
-                        )
-                      : const Icon(Icons.add_circle_outline),
-                  label: _isLoading
-                      ? const Text('Creating session...')
-                      : const Text('Create new session'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.blue,
-                    side: const BorderSide(color: Colors.blue, width: 1.5),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    textStyle: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const Spacer(),
-              ],
+              ),
             ),
           ),
-        ),
+          Positioned(
+            bottom: -80,
+            right: -80,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [Colors.pinkAccent.withAlpha(60), Colors.transparent],
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Spacer(flex: 2),
+                  Align(
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.pink.withAlpha(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.pink.withAlpha(60),
+                            blurRadius: 32,
+                            spreadRadius: 6,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.directions_car,
+                        size: 52,
+                        color: Colors.pink,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  const Text(
+                    'Vehicle Diagnostics 3D',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Sign in to access your vehicle data',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.black45,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const Spacer(flex: 3),
+                  FilledButton.icon(
+                    onPressed: _isLoading ? null : _openScanner,
+                    icon: const Icon(Icons.qr_code_scanner),
+                    label: const Text('Sign in with QR Code'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.pink,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      textStyle: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: _isLoading ? null : _generateNewSession,
+                    icon: _isLoading
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.pink,
+                            ),
+                          )
+                        : const Icon(Icons.add_circle_outline),
+                    label: _isLoading
+                        ? const Text('Creating session...')
+                        : const Text('Create new session'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.pink,
+                      side: const BorderSide(color: Colors.pink, width: 1.5),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      textStyle: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
