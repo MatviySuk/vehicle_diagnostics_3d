@@ -20,7 +20,8 @@ class _PivotComponent extends Component3D {
   _PivotComponent({super.position});
 }
 
-// --- Jogo do carro completo ---
+// ING: Main 3D car game — handles model loading, lighting and pan rotation.
+// PT: Jogo 3D principal do carro — gere carregamento do modelo, luzes e rotação por arrasto.
 class SimpleGame3D extends FlameGame3D<World3D, CameraComponent3D>
     with PanDetector {
   late ModelComponent _car;
@@ -40,7 +41,8 @@ class SimpleGame3D extends FlameGame3D<World3D, CameraComponent3D>
         ),
       );
 
-  // inicia o parse dos modelos em background — chamar em main() logo após criar o jogo
+  // ING: Starts parsing models in the background — call in main() right after creating the game.
+  // PT: Inicia o parse dos modelos em background — chamar em main() logo após criar o jogo.
   void startPreloading() {
     _preloadFuture = _loadModels();
   }
@@ -57,7 +59,9 @@ class SimpleGame3D extends FlameGame3D<World3D, CameraComponent3D>
   @override
   FutureOr<void> onLoad() async {
     if (_preloadFuture != null) {
-      await _preloadFuture; // modelos já a carregar — aguarda apenas o que falta
+      // ING: Models already loading in background — wait only for what remains.
+      // PT: Modelos já a carregar em background — aguarda apenas o que falta.
+      await _preloadFuture;
     } else {
       await _loadModels();
     }
@@ -70,7 +74,8 @@ class SimpleGame3D extends FlameGame3D<World3D, CameraComponent3D>
       scale: Vector3.all(15.0),
     );
 
-    // cubo invisível que marca a posição do farol no modelo
+    // ING: Invisible cube marking the headlight position on the model.
+    // PT: Cubo invisível que marca a posição do farol no modelo.
     final headlightCube = MeshComponent(
       position: Vector3(0.008, 0.007, 0.024),
       mesh: CuboidMesh(
@@ -79,7 +84,8 @@ class SimpleGame3D extends FlameGame3D<World3D, CameraComponent3D>
       ),
     );
 
-    // cubo invisível que marca a posição das rodas no modelo
+    // ING: Invisible cube marking the wheels position on the model.
+    // PT: Cubo invisível que marca a posição das rodas no modelo.
     final wheelsCube = MeshComponent(
       position: Vector3(0.009, 0.007, 0.016),
       rotation: Quaternion.axisAngle(Vector3(0, 1, 0), math.pi / 2),
@@ -132,7 +138,8 @@ class SimpleGame3D extends FlameGame3D<World3D, CameraComponent3D>
   }
 }
 
-// --- Jogo do farol (painel popup) ---
+// ING: Headlight game displayed inside the popup panel.
+// PT: Jogo do farol apresentado dentro do painel popup.
 class HeadlightGame extends FlameGame3D<World3D, CameraComponent3D> {
   final Model? preloadedModel;
   double _angle = 0;
@@ -183,7 +190,8 @@ class HeadlightGame extends FlameGame3D<World3D, CameraComponent3D> {
   }
 }
 
-// --- Jogo das rodas (painel popup) ---
+// ING: Wheels game displayed inside the popup panel.
+// PT: Jogo das rodas apresentado dentro do painel popup.
 class WheelsGame extends FlameGame3D<World3D, CameraComponent3D> {
   final Model? preloadedModel;
   double _angle = 0;
