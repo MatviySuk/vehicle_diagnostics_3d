@@ -74,7 +74,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
       return Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF0A1628),
+          backgroundColor: const Color(0xFF1A0812),
           foregroundColor: Colors.white,
           title: const Text('Scan QR Code'),
           leading: IconButton(
@@ -90,7 +90,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 width: 240,
                 height: 240,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2.5),
+                  border: Border.all(color: Colors.pink, width: 2.5),
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
@@ -99,7 +99,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               const ColoredBox(
                 color: Colors.black54,
                 child: Center(
-                  child: CircularProgressIndicator(color: Colors.blue),
+                  child: CircularProgressIndicator(color: Colors.pink),
                 ),
               ),
           ],
@@ -113,7 +113,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF0A1628), Color(0xFF060E1A)],
+            colors: [Color(0xFF1A0812), Color(0xFF0D0509)],
           ),
         ),
         child: SafeArea(
@@ -129,10 +129,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                     height: 100,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.blue.withAlpha(38),
+                      color: Colors.pink.withAlpha(38),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.blue.withAlpha(64),
+                          color: Colors.pink.withAlpha(64),
                           blurRadius: 32,
                           spreadRadius: 6,
                         ),
@@ -141,7 +141,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                     child: const Icon(
                       Icons.directions_car,
                       size: 52,
-                      color: Colors.blue,
+                      color: Colors.pink,
                     ),
                   ),
                 ),
@@ -171,7 +171,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                   icon: const Icon(Icons.qr_code_scanner),
                   label: const Text('Sign in with QR Code'),
                   style: FilledButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Colors.pink,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     textStyle: const TextStyle(
@@ -192,7 +192,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                           height: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.blue,
+                            color: Colors.pink,
                           ),
                         )
                       : const Icon(Icons.add_circle_outline),
@@ -200,8 +200,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                       ? const Text('Creating session...')
                       : const Text('Create new session'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.blue,
-                    side: const BorderSide(color: Colors.blue, width: 1.5),
+                    foregroundColor: Colors.pink,
+                    side: const BorderSide(color: Colors.pink, width: 1.5),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     textStyle: const TextStyle(
                       fontSize: 16,
