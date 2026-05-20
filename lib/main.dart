@@ -9,7 +9,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final sharedPreferences = await SharedPreferences.getInstance();
   final game = SimpleGame3D();
-  game.startPreloading(); // parse dos modelos em background enquanto a app arranca
+  // ING: Parse models in the background while the app boots.
+  // PT: Parse dos modelos em background enquanto a app arranca.
+  game.startPreloading();
 
   runApp(
     ProviderScope(
