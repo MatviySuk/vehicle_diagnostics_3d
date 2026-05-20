@@ -52,23 +52,13 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('3D Vehicle View'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: Image.asset(
-              'assets/images/logo-App-A1.png',
-              height: 36,
-            ),
-          ),
-        ],
-      ),
+      appBar: AppBar(),
       body: GestureDetector(
         onTapUp: _onTap,
         child: Stack(
           children: [
-            // fundo com imagem do carro
+            // ING: Background image of the car, centered on screen.
+            // PT: Imagem de fundo do carro, centrada no ecrã.
             Positioned.fill(
               child: Align(
                 alignment: Alignment.center,
@@ -80,7 +70,8 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
               ),
             ),
 
-            // modelo 3D do carro
+            // ING: 3D car model game widget.
+            // PT: Widget do jogo com o modelo 3D do carro.
             GameWidget(
               game: _game,
               loadingBuilder: (context) => const Center(
@@ -89,28 +80,30 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
                   children: [
                     CircularProgressIndicator(),
                     SizedBox(height: 16),
-                    Text('A carregar modelo 3D...'),
+                    Text('Loading 3D model...'),
                   ],
                 ),
               ),
             ),
 
-            // painel popup — farol
+            // ING: Popup panel — headlight.
+            // PT: Painel popup — farol.
             if (_showHeadlightPanel)
               _ComponentPanel(
-                title: 'Farol Dianteiro',
+                title: 'Car Headlight',
                 game: _headlightGame!,
                 indicators: const [
                   _CircularIndicator(label: 'LED OK', value: '6000K', progress: 1.0, color: Colors.green),
-                  _CircularIndicator(label: 'Uso', value: '847h', progress: 847 / 2000, color: Colors.orange),
+                  _CircularIndicator(label: 'Usage', value: '847h', progress: 847 / 2000, color: Colors.orange),
                 ],
                 onClose: () => setState(() => _showHeadlightPanel = false),
               ),
 
-            // painel popup — rodas
+            // ING: Popup panel — wheels.
+            // PT: Painel popup — rodas.
             if (_showWheelsPanel)
               _ComponentPanel(
-                title: 'Roda',
+                title: 'Wheels',
                 game: _wheelsGame!,
                 indicators: const [
                   _CircularIndicator(label: 'PSI', value: '26', progress: 26 / 38, color: Colors.red),
@@ -118,7 +111,8 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
                 onClose: () => setState(() => _showWheelsPanel = false),
               ),
 
-            // botão reset — só aparece depois do modelo carregar
+            // ING: Reset button — only visible after the model is loaded.
+            // PT: Botão reset — só aparece depois do modelo carregar.
             ValueListenableBuilder<bool>(
               valueListenable: _game.modelReady,
               builder: (context, loaded, _) {
@@ -137,6 +131,17 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
                 );
               },
             ),
+
+            // ING: Logo — last in the Stack, always rendered on top.
+            // PT: Logótipo — último na Stack, sempre por cima de tudo.
+            Positioned(
+              top: 20,
+              right: 16,
+              child: Image.asset(
+                'assets/images/logo-App-A1.png',
+                height: 60,
+              ),
+            ),
           ],
         ),
       ),
@@ -144,7 +149,8 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
   }
 }
 
-// --- Painel popup genérico para componente 3D ---
+// ING: Generic popup panel for a 3D component.
+// PT: Painel popup genérico para componente 3D.
 class _ComponentPanel extends StatelessWidget {
   final String title;
   final Game game;
@@ -177,13 +183,14 @@ class _ComponentPanel extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               child: Column(
                 children: [
-                  // cabeçalho com título e botão fechar
+                  // ING: Header with title and close button.
+                  // PT: Cabeçalho com título e botão fechar.
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(title, style: const TextStyle(color: Colors.white, fontSize: 14)),
+                        Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
                         IconButton(
                           icon: const Icon(Icons.close, color: Colors.white, size: 18),
                           onPressed: onClose,
@@ -193,7 +200,8 @@ class _ComponentPanel extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // modelo 3D rotativo
+                  // ING: Rotating 3D model.
+                  // PT: Modelo 3D rotativo.
                   Expanded(
                     flex: 70,
                     child: Transform.translate(
@@ -201,7 +209,8 @@ class _ComponentPanel extends StatelessWidget {
                       child: GameWidget(game: game),
                     ),
                   ),
-                  // indicadores circulares
+                  // ING: Circular indicators.
+                  // PT: Indicadores circulares.
                   Expanded(
                     flex: 30,
                     child: Transform.translate(
@@ -222,7 +231,8 @@ class _ComponentPanel extends StatelessWidget {
   }
 }
 
-// --- Indicador circular reutilizável ---
+// ING: Reusable circular indicator widget.
+// PT: Widget de indicador circular reutilizável.
 class _CircularIndicator extends StatelessWidget {
   final String label;
   final String value;
