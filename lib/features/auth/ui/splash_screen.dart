@@ -39,7 +39,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF0A1628), Color(0xFF060E1A)],
+            colors: [Color(0xFF1A0812), Color(0xFF0D0509)],
           ),
         ),
         child: SafeArea(
@@ -51,10 +51,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 height: 120,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.blue.withAlpha(38),
+                  color: Colors.pink.withAlpha(38),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.blue.withAlpha(76),
+                      color: Colors.pink.withAlpha(76),
                       blurRadius: 48,
                       spreadRadius: 12,
                     ),
@@ -63,7 +63,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 child: const Icon(
                   Icons.directions_car,
                   size: 64,
-                  color: Colors.blue,
+                  color: Colors.pink,
                 ),
               ),
               const SizedBox(height: 32),
@@ -80,7 +80,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               const Text(
                 '3 D',
                 style: TextStyle(
-                  color: Colors.blue,
+                  color: Colors.pink,
                   fontSize: 16,
                   fontWeight: FontWeight.w300,
                   letterSpacing: 8,
@@ -90,7 +90,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               const Padding(
                 padding: EdgeInsets.only(bottom: 56),
                 child: CircularProgressIndicator(
-                  color: Colors.blue,
+                  color: Colors.pink,
                   strokeWidth: 2,
                 ),
               ),
