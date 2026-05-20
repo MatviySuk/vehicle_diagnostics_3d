@@ -1,16 +1,23 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'car_3d_game.dart';
 
-class Car3DScreen extends StatefulWidget {
+class Car3DScreen extends ConsumerStatefulWidget {
   const Car3DScreen({super.key});
 
   @override
-  State<Car3DScreen> createState() => _Car3DScreenState();
+  ConsumerState<Car3DScreen> createState() => _Car3DScreenState();
 }
 
-class _Car3DScreenState extends State<Car3DScreen> {
-  final SimpleGame3D _game = SimpleGame3D();
+class _Car3DScreenState extends ConsumerState<Car3DScreen> {
+  late final SimpleGame3D _game;
+
+  @override
+  void initState() {
+    super.initState();
+    _game = ref.read(car3dGameProvider);
+  }
 
   bool _showHeadlightPanel = false;
   HeadlightGame? _headlightGame;
@@ -140,7 +147,7 @@ class _Car3DScreenState extends State<Car3DScreen> {
 // --- Painel popup genérico para componente 3D ---
 class _ComponentPanel extends StatelessWidget {
   final String title;
-  final Object game;
+  final Game game;
   final List<_CircularIndicator> indicators;
   final VoidCallback onClose;
 

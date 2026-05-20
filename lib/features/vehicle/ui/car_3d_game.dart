@@ -10,6 +10,11 @@ import 'package:flame_3d/model.dart';
 import 'package:flame_3d/parser.dart';
 import 'package:flame_3d/resources.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final car3dGameProvider = Provider<SimpleGame3D>((ref) {
+  throw UnimplementedError('car3dGameProvider must be overridden in main');
+});
 
 class _PivotComponent extends Component3D {
   _PivotComponent({super.position});
@@ -19,8 +24,10 @@ class _PivotComponent extends Component3D {
 class SimpleGame3D extends FlameGame3D<World3D, CameraComponent3D>
     with PanDetector {
   late ModelComponent _car;
+  Model? _carModel;
   Model? headlightModel;
   Model? wheelsModel;
+  Future<void>? _preloadFuture;
   double _rotationY = -0.64159;
   final modelReady = ValueNotifier<bool>(false);
 
@@ -33,14 +40,28 @@ class SimpleGame3D extends FlameGame3D<World3D, CameraComponent3D>
         ),
       );
 
+  // inicia o parse dos modelos em background — chamar em main() logo após criar o jogo
+  void startPreloading() {
+    _preloadFuture = _loadModels();
+  }
+
+  Future<void> _loadModels() async {
+    _carModel = await ModelParser.parse('models/Untitled4.gltf');
+    headlightModel = await ModelParser.parse('models/headlight-front-right-1.gltf');
+    wheelsModel = await ModelParser.parse('models/Untitled-wheels7.gltf');
+  }
+
   @override
   Color backgroundColor() => const Color(0x00000000);
 
   @override
   FutureOr<void> onLoad() async {
-    final model = await ModelParser.parse('models/Untitled4.gltf');
-    headlightModel = await ModelParser.parse('models/headlight-front-right-1.gltf');
-    wheelsModel = await ModelParser.parse('models/Untitled-wheels7.gltf');
+    if (_preloadFuture != null) {
+      await _preloadFuture; // modelos já a carregar — aguarda apenas o que falta
+    } else {
+      await _loadModels();
+    }
+    final model = _carModel!;
 
     _car = ModelComponent(
       model: model,
