@@ -74,14 +74,6 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
       data: (c) => c.status.lastUpdated,
     );
 
-    final pressureColor = minPressure == null
-        ? Colors.grey
-        : minPressure < 2.0
-            ? Colors.red
-            : minPressure < 2.3
-                ? Colors.orange
-                : Colors.green;
-
     return Scaffold(
       appBar: AppBar(),
       body: GestureDetector(
@@ -124,8 +116,8 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
                 title: 'Headlight',
                 game: _headlightGame!,
                 indicators: const [
-                  _CircularIndicator(label: 'LED OK', value: '6000K', progress: 1.0, color: Colors.green),
-                  _CircularIndicator(label: 'Usage', value: '847h', progress: 847 / 2000, color: Colors.orange),
+                  _CircularIndicator(label: 'LED OK', value: '6000K', progress: 1.0, color: Color(0xFF3D9641), valueColor: Color(0xFF1B5E20)),
+                  _CircularIndicator(label: 'Usage', value: '847h', progress: 847 / 2000, color: Color(0xFFFFB300)),
                 ],
                 onClose: () => setState(() => _showHeadlightPanel = false),
                 onDetail: () => context.push('/component/headlight'),
@@ -142,7 +134,8 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
                     label: 'Min bar',
                     value: minPressure != null ? minPressure.toStringAsFixed(1) : '...',
                     progress: minPressure != null ? (minPressure / 2.9).clamp(0.0, 1.0) : 0.0,
-                    color: pressureColor,
+                    color: const Color(0xFF3D9641),
+                    valueColor: const Color(0xFF1B5E20),
                   ),
                 ],
                 onClose: () => setState(() => _showWheelsPanel = false),
@@ -246,7 +239,7 @@ class _ComponentPanel extends StatelessWidget {
           aspectRatio: 0.75,
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0x88808080),
+              color: const Color(0x77A0A0A0),
               borderRadius: BorderRadius.circular(12),
             ),
             child: ClipRRect(
@@ -255,13 +248,14 @@ class _ComponentPanel extends StatelessWidget {
                 children: [
                   // ING: Header with title, centred details button and close button.
                   // PT: Cabeçalho com título, botão de detalhes centrado e botão fechar.
+                  const SizedBox(height: 4),
                   Row(
                     children: [
                       Expanded(
                         flex: 3,
                         child: Padding(
                           padding: const EdgeInsets.only(left: 12),
-                          child: Text(title, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                          child: Text(title, style: const TextStyle(color: Colors.black87, fontSize: 20, fontWeight: FontWeight.bold)),
                         ),
                       ),
                       Expanded(
@@ -269,11 +263,12 @@ class _ComponentPanel extends StatelessWidget {
                         child: onDetail != null
                             ? TextButton.icon(
                                 onPressed: onDetail,
-                                icon: const Icon(Icons.open_in_new, color: Colors.white70, size: 16),
-                                label: const Text('Details', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                                icon: const Icon(Icons.open_in_new, color: Colors.black87, size: 16),
+                                label: const Text('Details', style: TextStyle(color: Colors.black87, fontSize: 13)),
                                 style: TextButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(vertical: 8),
-                                  side: const BorderSide(color: Colors.white30, width: 1),
+                                  backgroundColor: Colors.transparent,
+                                  side: const BorderSide(color: Colors.black45, width: 1),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                 ),
                               )
@@ -286,11 +281,11 @@ class _ComponentPanel extends StatelessWidget {
                           width: 36,
                           height: 36,
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white30, width: 1),
+                            border: Border.all(color: Colors.black45, width: 1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.close, color: Colors.white, size: 18),
+                            icon: const Icon(Icons.close, color: Colors.black87, size: 18),
                             onPressed: onClose,
                             padding: EdgeInsets.zero,
                           ),
@@ -336,12 +331,14 @@ class _CircularIndicator extends StatelessWidget {
   final String value;
   final double progress;
   final Color color;
+  final Color? valueColor;
 
   const _CircularIndicator({
     required this.label,
     required this.value,
     required this.progress,
     required this.color,
+    this.valueColor,
   });
 
   @override
@@ -355,15 +352,15 @@ class _CircularIndicator extends StatelessWidget {
           child: CircularProgressIndicator(
             value: progress,
             strokeWidth: 8,
-            backgroundColor: Colors.white24,
+            backgroundColor: Colors.black12,
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
         ),
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(value, style: TextStyle(color: color, fontSize: 18, fontWeight: FontWeight.bold)),
-            Text(label, style: const TextStyle(color: Colors.white, fontSize: 11)),
+            Text(value, style: TextStyle(color: valueColor ?? color, fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(label, style: const TextStyle(color: Colors.black54, fontSize: 11, fontWeight: FontWeight.bold)),
           ],
         ),
       ],
