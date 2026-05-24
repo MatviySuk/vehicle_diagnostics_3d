@@ -30,6 +30,8 @@ class _ComponentDetailScreenState extends ConsumerState<ComponentDetailScreen> {
       _componentGame = HeadlightGame(preloadedModel: mainGame.headlightModel);
     } else if (id.contains('wheel') || id.contains('tire') || id.contains('tyre')) {
       _componentGame = WheelsGame(preloadedModel: mainGame.wheelsModel);
+    } else if (id.contains('brake')) {
+      _componentGame = BrakesGame(preloadedModel: mainGame.brakesModel);
     }
   }
 
