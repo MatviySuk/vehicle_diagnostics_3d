@@ -258,8 +258,8 @@ class _ComponentPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: 50,
-      right: 50,
+      left: 30,
+      right: 30,
       top: 0,
       bottom: 0,
       child: Center(
