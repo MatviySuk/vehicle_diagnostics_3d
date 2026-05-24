@@ -38,15 +38,21 @@ class DashboardScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ING: Logout button top-left.
-                // PT: Botão logout topo-esquerda.
-                IconButton(
-                  icon: const Icon(Icons.logout),
-                  tooltip: 'Logout',
-                  onPressed: () async {
-                    await ref.read(authNotifierProvider.notifier).logout();
-                    if (context.mounted) context.go('/welcome');
-                  },
+                // ING: Logout button top-right.
+                // PT: Botão logout topo-direita.
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      icon: const Icon(Icons.logout),
+                      tooltip: 'Logout',
+                      onPressed: () async {
+                        await ref.read(authNotifierProvider.notifier).logout();
+                        if (context.mounted) context.go('/welcome');
+                      },
+                    ),
+                  ),
                 ),
 
                 // ING: Vehicle status cards — 30dp extra top padding.
