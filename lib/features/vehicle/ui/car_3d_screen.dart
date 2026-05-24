@@ -121,7 +121,7 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
             // PT: Painel popup — farol.
             if (_showHeadlightPanel)
               _ComponentPanel(
-                title: 'Car Headlight',
+                title: 'Headlight',
                 game: _headlightGame!,
                 indicators: const [
                   _CircularIndicator(label: 'LED OK', value: '6000K', progress: 1.0, color: Colors.green),
@@ -253,38 +253,50 @@ class _ComponentPanel extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               child: Column(
                 children: [
-                  // ING: Header with title, details button and close button.
-                  // PT: Cabeçalho com título, botão de detalhes e botão fechar.
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (onDetail != null)
-                              TextButton.icon(
-                                onPressed: onDetail,
-                                icon: const Icon(Icons.open_in_new, color: Colors.white70, size: 14),
-                                label: const Text('Details', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                ),
-                              ),
-                            IconButton(
-                              icon: const Icon(Icons.close, color: Colors.white, size: 18),
-                              onPressed: onClose,
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                          ],
+                  // ING: Header with title, centred details button and close button.
+                  // PT: Cabeçalho com título, botão de detalhes centrado e botão fechar.
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 12),
+                          child: Text(title, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
                         ),
-                      ],
-                    ),
+                      ),
+                      Expanded(
+                        flex: 4,
+                        child: onDetail != null
+                            ? TextButton.icon(
+                                onPressed: onDetail,
+                                icon: const Icon(Icons.open_in_new, color: Colors.white70, size: 16),
+                                label: const Text('Details', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                  side: const BorderSide(color: Colors.white30, width: 1),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                      const SizedBox(width: 8),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white30, width: 1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.close, color: Colors.white, size: 18),
+                            onPressed: onClose,
+                            padding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   // ING: Rotating 3D model.
                   // PT: Modelo 3D rotativo.
