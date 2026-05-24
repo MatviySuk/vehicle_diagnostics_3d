@@ -27,6 +27,9 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
   bool _showWheelsPanel = false;
   WheelsGame? _wheelsGame;
 
+  bool _showBrakesPanel = false;
+  BrakesGame? _brakesGame;
+
   void _onTap(TapUpDetails details) {
     if (!_game.modelReady.value) return;
     final tap = details.localPosition;
@@ -47,6 +50,16 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
       setState(() => _showWheelsPanel = true);
       Future.delayed(const Duration(seconds: 8), () {
         if (mounted) setState(() => _showWheelsPanel = false);
+      });
+      return;
+    }
+
+    final brakesScreen = _game.brakesScreenPosition();
+    if (brakesScreen != null && (tap - brakesScreen).distance < 50) {
+      _brakesGame ??= BrakesGame(preloadedModel: _game.brakesModel);
+      setState(() => _showBrakesPanel = true);
+      Future.delayed(const Duration(seconds: 10), () {
+        if (mounted) setState(() => _showBrakesPanel = false);
       });
     }
   }
@@ -116,8 +129,8 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
                 title: 'Headlight',
                 game: _headlightGame!,
                 indicators: const [
-                  _CircularIndicator(label: 'LED OK', value: '6000K', progress: 1.0, color: Color(0xFF3D9641), valueColor: Color(0xFF1B5E20)),
-                  _CircularIndicator(label: 'Usage', value: '847h', progress: 847 / 2000, color: Color(0xFFFFB300)),
+                  _CircularIndicator(label: 'LED OK', value: '6000K', progress: 1.0, color: Color(0xFF3D9641), valueColor: Color(0xFF1B5E20), labelColor: Colors.black87),
+                  _CircularIndicator(label: 'Usage', value: '847h', progress: 847 / 2000, color: Color(0xFFFFB300), labelColor: Colors.black87),
                 ],
                 onClose: () => setState(() => _showHeadlightPanel = false),
                 onDetail: () => context.push('/component/headlight'),
@@ -136,10 +149,25 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
                     progress: minPressure != null ? (minPressure / 2.9).clamp(0.0, 1.0) : 0.0,
                     color: const Color(0xFF3D9641),
                     valueColor: const Color(0xFF1B5E20),
+                    labelColor: Colors.black87,
                   ),
                 ],
                 onClose: () => setState(() => _showWheelsPanel = false),
                 onDetail: () => context.push('/component/wheel'),
+              ),
+
+            // ING: Popup panel — brakes.
+            // PT: Painel popup — travões.
+            if (_showBrakesPanel)
+              _ComponentPanel(
+                title: 'Brakes',
+                game: _brakesGame!,
+                indicators: const [
+                  _CircularIndicator(label: 'Temp °C', value: '85', progress: 85 / 500, color: Color(0xFF3D9641), valueColor: Color(0xFF1B5E20), labelColor: Colors.black87),
+                  _CircularIndicator(label: 'Wear', value: '78%', progress: 0.78, color: Color(0xFFFFB300), labelColor: Colors.black87),
+                ],
+                onClose: () => setState(() => _showBrakesPanel = false),
+                onDetail: () => context.push('/component/brakes'),
               ),
 
             // ING: Offline banner — shown when data comes from local cache.
@@ -332,6 +360,7 @@ class _CircularIndicator extends StatelessWidget {
   final double progress;
   final Color color;
   final Color? valueColor;
+  final Color? labelColor;
 
   const _CircularIndicator({
     required this.label,
@@ -339,6 +368,7 @@ class _CircularIndicator extends StatelessWidget {
     required this.progress,
     required this.color,
     this.valueColor,
+    this.labelColor,
   });
 
   @override
@@ -360,7 +390,7 @@ class _CircularIndicator extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(value, style: TextStyle(color: valueColor ?? color, fontSize: 18, fontWeight: FontWeight.bold)),
-            Text(label, style: const TextStyle(color: Colors.black54, fontSize: 11, fontWeight: FontWeight.bold)),
+            Text(label, style: TextStyle(color: labelColor ?? Colors.black54, fontSize: 11, fontWeight: FontWeight.bold)),
           ],
         ),
       ],
