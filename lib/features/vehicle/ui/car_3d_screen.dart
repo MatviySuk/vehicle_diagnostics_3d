@@ -1,6 +1,7 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'car_3d_game.dart';
 import '../logic/vehicle_cache.dart';
 
@@ -127,6 +128,7 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
                   _CircularIndicator(label: 'Usage', value: '847h', progress: 847 / 2000, color: Colors.orange),
                 ],
                 onClose: () => setState(() => _showHeadlightPanel = false),
+                onDetail: () => context.push('/component/headlight'),
               ),
 
             // ING: Popup panel — wheels with live Firebase tyre pressure.
@@ -144,6 +146,7 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
                   ),
                 ],
                 onClose: () => setState(() => _showWheelsPanel = false),
+                onDetail: () => context.push('/component/wheel'),
               ),
 
             // ING: Offline banner — shown when data comes from local cache.
@@ -221,12 +224,14 @@ class _ComponentPanel extends StatelessWidget {
   final Game game;
   final List<_CircularIndicator> indicators;
   final VoidCallback onClose;
+  final VoidCallback? onDetail;
 
   const _ComponentPanel({
     required this.title,
     required this.game,
     required this.indicators,
     required this.onClose,
+    this.onDetail,
   });
 
   @override
@@ -248,19 +253,35 @@ class _ComponentPanel extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               child: Column(
                 children: [
-                  // ING: Header with title and close button.
-                  // PT: Cabeçalho com título e botão fechar.
+                  // ING: Header with title, details button and close button.
+                  // PT: Cabeçalho com título, botão de detalhes e botão fechar.
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
-                        IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white, size: 18),
-                          onPressed: onClose,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (onDetail != null)
+                              TextButton.icon(
+                                onPressed: onDetail,
+                                icon: const Icon(Icons.open_in_new, color: Colors.white70, size: 14),
+                                label: const Text('Details', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                              ),
+                            IconButton(
+                              icon: const Icon(Icons.close, color: Colors.white, size: 18),
+                              onPressed: onClose,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ],
                         ),
                       ],
                     ),
