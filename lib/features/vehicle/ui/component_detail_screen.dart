@@ -1,6 +1,8 @@
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../logic/vehicle_providers.dart';
+import 'car_3d_game.dart';
 
 class ComponentDetailScreen extends ConsumerStatefulWidget {
   final String componentId;
@@ -15,6 +17,21 @@ class _ComponentDetailScreenState extends ConsumerState<ComponentDetailScreen> {
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
   String _selectedSeverity = 'low';
+  Game? _componentGame;
+
+  @override
+  void initState() {
+    super.initState();
+    // ING: Map componentId to the matching preloaded 3D game.
+    // PT: Associa o componentId ao jogo 3D pré-carregado correspondente.
+    final id = widget.componentId.toLowerCase();
+    final mainGame = ref.read(car3dGameProvider);
+    if (id.contains('headlight')) {
+      _componentGame = HeadlightGame(preloadedModel: mainGame.headlightModel);
+    } else if (id.contains('wheel') || id.contains('tire') || id.contains('tyre')) {
+      _componentGame = WheelsGame(preloadedModel: mainGame.wheelsModel);
+    }
+  }
 
   @override
   void dispose() {
@@ -64,19 +81,18 @@ class _ComponentDetailScreenState extends ConsumerState<ComponentDetailScreen> {
       appBar: AppBar(title: Text('Component: ${widget.componentId}')),
       body: Column(
         children: [
-          // AGOSTINHO'S 3D COMPONENT WIDGET
+          // ING: Rotating 3D component view — matched by componentId.
+          // PT: Vista 3D rotativa do componente — associada pelo componentId.
           Expanded(
             flex: 1,
-            child: Container(
-              color: Colors.grey[900],
-              child: Center(
-                child: Text(
-                  '3D Rotating ${widget.componentId}\n(Agostinho\'s Flame Widget)',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
-                ),
-              ),
-            ),
+            child: _componentGame != null
+                ? GameWidget(game: _componentGame!)
+                : Container(
+                    color: Colors.grey[900],
+                    child: const Center(
+                      child: Icon(Icons.view_in_ar, color: Colors.white54, size: 64),
+                    ),
+                  ),
           ),
           // MAHMUD'S DIAGNOSTIC UI / FORM HANDLING
           Expanded(
