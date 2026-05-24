@@ -2,6 +2,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'car_3d_game.dart';
+import '../logic/vehicle_cache.dart';
 
 class Car3DScreen extends ConsumerStatefulWidget {
   const Car3DScreen({super.key});
@@ -51,6 +52,35 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final vehicleAsync = ref.watch(cachedVehicleStatusProvider);
+
+    final minPressure = vehicleAsync.whenOrNull(
+      data: (cached) {
+        final v = cached.status;
+        final values = [
+          v.frontLeftTirePressure,
+          v.frontRightTirePressure,
+          v.rearLeftTirePressure,
+          v.rearRightTirePressure,
+        ];
+        return values.reduce((a, b) => a < b ? a : b);
+      },
+    );
+
+    final isOffline = vehicleAsync.whenOrNull(data: (c) => c.fromCache) ?? false;
+
+    final lastUpdated = vehicleAsync.whenOrNull(
+      data: (c) => c.status.lastUpdated,
+    );
+
+    final pressureColor = minPressure == null
+        ? Colors.grey
+        : minPressure < 2.0
+            ? Colors.red
+            : minPressure < 2.3
+                ? Colors.orange
+                : Colors.green;
+
     return Scaffold(
       appBar: AppBar(),
       body: GestureDetector(
@@ -99,16 +129,51 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
                 onClose: () => setState(() => _showHeadlightPanel = false),
               ),
 
-            // ING: Popup panel — wheels.
-            // PT: Painel popup — rodas.
+            // ING: Popup panel — wheels with live Firebase tyre pressure.
+            // PT: Painel popup — rodas com pressão real do Firebase.
             if (_showWheelsPanel)
               _ComponentPanel(
                 title: 'Wheels',
                 game: _wheelsGame!,
-                indicators: const [
-                  _CircularIndicator(label: 'PSI', value: '26', progress: 26 / 38, color: Colors.red),
+                indicators: [
+                  _CircularIndicator(
+                    label: 'Min bar',
+                    value: minPressure != null ? minPressure.toStringAsFixed(1) : '...',
+                    progress: minPressure != null ? (minPressure / 2.9).clamp(0.0, 1.0) : 0.0,
+                    color: pressureColor,
+                  ),
                 ],
                 onClose: () => setState(() => _showWheelsPanel = false),
+              ),
+
+            // ING: Offline banner — shown when data comes from local cache.
+            // PT: Aviso offline — mostrado quando os dados vêm da cache local.
+            if (isOffline && lastUpdated != null)
+              Positioned(
+                bottom: 80,
+                left: 24,
+                right: 24,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withValues(alpha: 0.88),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.wifi_off, size: 14, color: Colors.black87),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Offline · Last sync: '
+                        '${lastUpdated.hour.toString().padLeft(2, '0')}:'
+                        '${lastUpdated.minute.toString().padLeft(2, '0')}',
+                        style: const TextStyle(color: Colors.black87, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
               ),
 
             // ING: Reset button — only visible after the model is loaded.
