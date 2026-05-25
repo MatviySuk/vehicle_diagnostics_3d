@@ -147,38 +147,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Spacer(flex: 2),
-                  Align(
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.pink.withAlpha(30),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.pink.withAlpha(60),
-                            blurRadius: 32,
-                            spreadRadius: 6,
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.directions_car,
-                        size: 52,
-                        color: Colors.pink,
-                      ),
-                    ),
-                  ),
                   const SizedBox(height: 28),
-                  const Text(
-                    'Vehicle Diagnostics 3D',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
+                  Image.asset(
+                    'assets/images/logo-App-A1.png',
+                    height: 40,
                   ),
                   const SizedBox(height: 8),
                   const Text(
