@@ -67,45 +67,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             child: Column(
               children: [
                 const Spacer(),
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.pink.withAlpha(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.pink.withAlpha(60),
-                        blurRadius: 32,
-                        spreadRadius: 8,
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.directions_car,
-                    size: 64,
-                    color: Colors.pink,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                const Text(
-                  'Vehicle Diagnostics',
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  '3 D',
-                  style: TextStyle(
-                    color: Colors.pink,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w300,
-                    letterSpacing: 8,
-                  ),
+                Image.asset(
+                  'assets/images/logo-App-A1.png',
+                  height: 40,
                 ),
                 const Spacer(),
                 const Padding(
