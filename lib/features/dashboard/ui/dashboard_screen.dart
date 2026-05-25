@@ -83,12 +83,14 @@ class DashboardScreen extends ConsumerWidget {
                           Row(
                             children: [
                               Expanded(child: _InfoCard(title: 'Front Left', value: status.frontLeftTirePressure.toString(), backgroundAlpha: 0.25)),
+                              const SizedBox(width: 4),
                               Expanded(child: _InfoCard(title: 'Front Right', value: status.frontRightTirePressure.toString(), backgroundAlpha: 0.25)),
                             ],
                           ),
                           Row(
                             children: [
                               Expanded(child: _InfoCard(title: 'Rear Left', value: status.rearLeftTirePressure.toString(), backgroundAlpha: 0.25)),
+                              const SizedBox(width: 4),
                               Expanded(child: _InfoCard(title: 'Rear Right', value: status.rearRightTirePressure.toString(), backgroundAlpha: 0.25)),
                             ],
                           ),
