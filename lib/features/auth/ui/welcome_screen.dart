@@ -184,7 +184,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                         ? const Text('Creating session...')
                         : const Text('Create new session'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFFf50019),
+                      foregroundColor: const Color(0xFFDE1859),
                       backgroundColor: const Color(0xFFbc2f98).withAlpha(25),
                       side: const BorderSide(color: Color(0xFFc62f98), width: 1.5),
                       padding: const EdgeInsets.symmetric(vertical: 16),
