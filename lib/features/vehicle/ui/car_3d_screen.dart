@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -87,8 +88,11 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
       data: (c) => c.status.lastUpdated,
     );
 
+    final topSafe = MediaQuery.of(context).padding.top;
+
     return Scaffold(
-      appBar: AppBar(),
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       body: GestureDetector(
         onTapUp: _onTap,
         child: Stack(
@@ -98,10 +102,13 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
             Positioned.fill(
               child: Align(
                 alignment: Alignment.center,
-                child: Image.asset(
-                  'assets/images/eve-M-rtWw1OlnQ-unsplash-4.jpg',
-                  height: MediaQuery.of(context).size.height * 0.6,
-                  fit: BoxFit.fitHeight,
+                child: Transform.translate(
+                  offset: const Offset(0, 30),
+                  child: Image.asset(
+                    'assets/images/eve-M-rtWw1OlnQ-unsplash-4.jpg',
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    fit: BoxFit.fitHeight,
+                  ),
                 ),
               ),
             ),
@@ -224,8 +231,8 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
             // ING: Logo — last in the Stack, always rendered on top.
             // PT: Logótipo — último na Stack, sempre por cima de tudo.
             Positioned(
-              top: 20,
-              right: 16,
+              top: topSafe + 60,
+              right: Platform.isIOS ? 1 : 16,
               child: Image.asset(
                 'assets/images/logo-App-A1.png',
                 height: 60,

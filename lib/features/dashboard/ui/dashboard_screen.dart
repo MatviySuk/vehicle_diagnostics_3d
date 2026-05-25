@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +13,9 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final vehicleStatusAsync = ref.watch(vehicleStatusProvider);
+    // ING: Real safe-area top inset — accounts for Dynamic Island and notch on iPhone.
+    // PT: Inset real do topo da área segura — compensa Dynamic Island e notch no iPhone.
+    final topSafe = MediaQuery.of(context).padding.top;
 
     return Scaffold(
       body: Stack(
@@ -100,8 +104,8 @@ class DashboardScreen extends ConsumerWidget {
           // ING: Logo — last in the Stack, always rendered on top, top-right like the 3D screen.
           // PT: Logótipo — último na Stack, sempre por cima de tudo, topo-direita como no ecrã 3D.
           Positioned(
-            top: 120,
-            right: 16,
+            top: topSafe + 60,
+            right: Platform.isIOS ? 1 : 16,
             child: Image.asset(
               'assets/images/logo-App-A1.png',
               height: 60,
