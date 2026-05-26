@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../vehicle/logic/vehicle_providers.dart';
+import '../../vehicle/logic/vehicle_cache.dart';
 import '../../auth/logic/auth_providers.dart';
 
 // ING: Main dashboard screen showing live vehicle status.
@@ -14,7 +15,7 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final vehicleStatusAsync = ref.watch(vehicleStatusProvider);
+    final vehicleStatusAsync = ref.watch(cachedVehicleStatusProvider);
     // ING: Real safe-area top inset — accounts for Dynamic Island and notch on iPhone.
     // PT: Inset real do topo da área segura — compensa Dynamic Island e notch no iPhone.
     final screenWidth = MediaQuery.of(context).size.width;
@@ -53,32 +54,32 @@ class DashboardScreen extends ConsumerWidget {
                     loading: () => const Center(child: _LoadingIndicator()),
                     error: (err, stack) => Center(child: Text('Error: $err')),
                     data: (status) => RefreshIndicator(
-                      onRefresh: () => ref.refresh(vehicleStatusProvider.future),
+                      onRefresh: () => ref.refresh(cachedVehicleStatusProvider.future),
                       child: ListView(
                         padding: EdgeInsets.fromLTRB(16, isDesktop ? 160 : 110, 16, 100),
                         children: [
-                          _InfoCard(title: 'VIN', value: status.vin),
-                          _InfoCard(title: 'Mileage', value: '${status.mileageKm} km'),
+                          _InfoCard(title: 'VIN', value: status.status.vin),
+                          _InfoCard(title: 'Mileage', value: '${status.status.mileageKm} km'),
                           _InfoCard(
                             title: 'Doors',
-                            value: status.isDoorsLocked ? 'Locked' : 'Unlocked',
-                            color: status.isDoorsLocked ? Colors.green[800] : Colors.red,
+                            value: status.status.isDoorsLocked ? 'Locked' : 'Unlocked',
+                            color: status.status.isDoorsLocked ? Colors.green[800] : Colors.red,
                           ),
                           const SizedBox(height: 20),
                           const Text('Tire Pressures (bar)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 10),
                           Row(
                             children: [
-                              Expanded(child: _InfoCard(title: 'Front Left', value: status.frontLeftTirePressure.toString(), backgroundAlpha: 0.25)),
+                              Expanded(child: _InfoCard(title: 'Front Left', value: status.status.frontLeftTirePressure.toString(), backgroundAlpha: 0.25)),
                               const SizedBox(width: 4),
-                              Expanded(child: _InfoCard(title: 'Front Right', value: status.frontRightTirePressure.toString(), backgroundAlpha: 0.25)),
+                              Expanded(child: _InfoCard(title: 'Front Right', value: status.status.frontRightTirePressure.toString(), backgroundAlpha: 0.25)),
                             ],
                           ),
                           Row(
                             children: [
-                              Expanded(child: _InfoCard(title: 'Rear Left', value: status.rearLeftTirePressure.toString(), backgroundAlpha: 0.25)),
+                              Expanded(child: _InfoCard(title: 'Rear Left', value: status.status.rearLeftTirePressure.toString(), backgroundAlpha: 0.25)),
                               const SizedBox(width: 4),
-                              Expanded(child: _InfoCard(title: 'Rear Right', value: status.rearRightTirePressure.toString(), backgroundAlpha: 0.25)),
+                              Expanded(child: _InfoCard(title: 'Rear Right', value: status.status.rearRightTirePressure.toString(), backgroundAlpha: 0.25)),
                             ],
                           ),
                         ],
