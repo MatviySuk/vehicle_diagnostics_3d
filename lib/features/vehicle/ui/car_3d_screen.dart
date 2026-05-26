@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'car_3d_game.dart';
 import '../logic/vehicle_cache.dart';
+import '../data/vehicle_repository.dart';
 
 class Car3DScreen extends ConsumerStatefulWidget {
   const Car3DScreen({super.key});
@@ -78,6 +79,14 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
       Future.delayed(const Duration(seconds: 10), () {
         if (mounted) setState(() => _showBrakesPanel = false);
       });
+      return;
+    }
+
+    final doorScreen = _game.doorScreenPosition();
+    if (doorScreen != null && (tap - doorScreen).distance < 50) {
+      _game.toggleLeftDoor();
+      final locked = !_game.isDoorOpen;
+      ref.read(vehicleRepositoryProvider).setDoorsLocked(locked);
     }
   }
 

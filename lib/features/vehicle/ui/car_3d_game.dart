@@ -26,6 +26,7 @@ class SimpleGame3D extends FlameGame3D<World3D, CameraComponent3D>
   late ModelComponent _car;
   ModelComponent? _doorLeftOpenComponent;
   bool _isDoorOpen = false;
+  bool get isDoorOpen => _isDoorOpen;
   Model? _carModel;
   Model? headlightModel;
   Model? wheelsModel;
@@ -111,9 +112,21 @@ class SimpleGame3D extends FlameGame3D<World3D, CameraComponent3D>
       ),
     );
 
+    // ING: Invisible cube marking the left door position on the model.
+    // PT: Cubo invisível que marca a posição da porta esquerda no modelo.
+    final doorCube = MeshComponent(
+      position: Vector3(0.009, 0.007, -0.005),
+      rotation: Quaternion.axisAngle(Vector3(0, 1, 0), math.pi / 2),
+      mesh: CuboidMesh(
+        size: Vector3(0.003, 0.002, 0.001),
+        material: SpatialMaterial(albedoColor: const Color(0x8800FF00)),
+      ),
+    );
+
     _car.add(headlightCube);
     _car.add(wheelsCube);
     _car.add(brakesCube);
+    _car.add(doorCube);
 
     world.addAll([
       LightComponent.ambient(intensity: 10.0),
@@ -145,6 +158,9 @@ class SimpleGame3D extends FlameGame3D<World3D, CameraComponent3D>
 
   Offset? brakesScreenPosition() =>
       _projectToScreen(Vector3(0.009, 0.004, 0.012));
+
+  Offset? doorScreenPosition() =>
+      _projectToScreen(Vector3(0.009, 0.007, -0.005));
 
   void setNodeVisible(String name, {bool visible = true}) {
     _car.hideNodeByName(name, hidden: !visible);

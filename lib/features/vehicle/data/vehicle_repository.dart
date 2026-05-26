@@ -45,6 +45,17 @@ class VehicleRepository {
     }
   }
 
+  Future<void> setDoorsLocked(bool locked) async {
+    try {
+      await _dio.patch(
+        '/v1/users/$_deviceId/vehicle/status.json',
+        data: {'isDoorsLocked': locked},
+      );
+    } on DioException catch (e) {
+      throw Exception('Failed to update door lock state: ${e.message}');
+    }
+  }
+
   Future<void> submitDiagnosticReport(DiagnosticReport report) async {
     try {
       // Use POST to push a new item to a list in Firebase RTDB scoped by device ID
