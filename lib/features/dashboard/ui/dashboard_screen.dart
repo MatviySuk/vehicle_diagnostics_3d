@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:math';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,7 +17,9 @@ class DashboardScreen extends ConsumerWidget {
     final vehicleStatusAsync = ref.watch(vehicleStatusProvider);
     // ING: Real safe-area top inset — accounts for Dynamic Island and notch on iPhone.
     // PT: Inset real do topo da área segura — compensa Dynamic Island e notch no iPhone.
-    final topSafe = MediaQuery.of(context).padding.top;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final topSafe = max(MediaQuery.of(context).padding.top, 20.0);
+    final isDesktop = screenWidth > 600;
 
     return Scaffold(
       body: Stack(
@@ -36,31 +40,14 @@ class DashboardScreen extends ConsumerWidget {
             ),
           ),
 
-          // ING: Main content — logout button and vehicle data cards.
-          // PT: Conteúdo principal — botão logout e cards de dados do veículo.
+          // ING: Main content — vehicle data cards.
+          // PT: Conteúdo principal — cards de dados do veículo.
           SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ING: Logout button top-right.
-                // PT: Botão logout topo-direita.
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: IconButton(
-                      icon: const Icon(Icons.logout),
-                      tooltip: 'Logout',
-                      onPressed: () async {
-                        await ref.read(authNotifierProvider.notifier).logout();
-                        if (context.mounted) context.go('/welcome');
-                      },
-                    ),
-                  ),
-                ),
-
-                // ING: Vehicle status cards — 30dp extra top padding.
-                // PT: Cards de estado do veículo — 30dp de padding extra no topo.
+                // ING: Vehicle status cards — top padding reserves space for the logo + overlay.
+                // PT: Cards de estado do veículo — padding superior reserva espaço para o logótipo e overlay.
                 Expanded(
                   child: vehicleStatusAsync.when(
                     loading: () => const Center(child: _LoadingIndicator()),
@@ -68,7 +55,7 @@ class DashboardScreen extends ConsumerWidget {
                     data: (status) => RefreshIndicator(
                       onRefresh: () => ref.refresh(vehicleStatusProvider.future),
                       child: ListView(
-                        padding: const EdgeInsets.fromLTRB(16, 110, 16, 16),
+                        padding: EdgeInsets.fromLTRB(16, isDesktop ? 160 : 110, 16, 100),
                         children: [
                           _InfoCard(title: 'VIN', value: status.vin),
                           _InfoCard(title: 'Mileage', value: '${status.mileageKm} km'),
@@ -103,11 +90,54 @@ class DashboardScreen extends ConsumerWidget {
             ),
           ),
 
+          // ING: Frosted glass top overlay — hides scrolling content behind the logo area.
+          // PT: Overlay difuso no topo — esconde o conteúdo que passa por baixo do logótipo.
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: topSafe + 120,
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.white.withValues(alpha: 0.75),
+                        Colors.white.withValues(alpha: 0.0),
+                      ],
+                      stops: const [0.65, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // ING: Logout button — above the overlay, positioned manually with topSafe.
+          // PT: Botão logout — acima do overlay, posicionado manualmente com topSafe.
+          Positioned(
+            top: topSafe,
+            right: 8,
+            child: IconButton(
+              icon: const Icon(Icons.logout),
+              tooltip: 'Logout',
+              onPressed: () async {
+                await ref.read(authNotifierProvider.notifier).logout();
+                if (context.mounted) context.go('/welcome');
+              },
+            ),
+          ),
+
           // ING: Logo — last in the Stack, always rendered on top, top-right like the 3D screen.
           // PT: Logótipo — último na Stack, sempre por cima de tudo, topo-direita como no ecrã 3D.
           Positioned(
-            top: topSafe + 60,
-            right: Platform.isIOS ? 1 : 16,
+            top: topSafe + 45,
+            left: isDesktop ? -65 : null,
+            right: isDesktop ? null : (Platform.isIOS ? 1.0 : 16.0),
             child: Image.asset(
               'assets/images/logo-App-A1.png',
               height: 60,
