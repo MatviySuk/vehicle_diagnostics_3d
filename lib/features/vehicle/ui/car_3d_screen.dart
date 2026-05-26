@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -120,7 +121,9 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
       data: (c) => c.status.lastUpdated,
     );
 
-    final topSafe = MediaQuery.of(context).padding.top;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final topSafe = max(MediaQuery.of(context).padding.top, 20.0);
+    final isDesktop = screenWidth > 600;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -264,7 +267,8 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
             // PT: Logótipo — último na Stack, sempre por cima de tudo.
             Positioned(
               top: topSafe + 60,
-              right: Platform.isIOS ? 1 : 16,
+              left: isDesktop ? 8 : null,
+              right: isDesktop ? null : (Platform.isIOS ? 1.0 : 16.0),
               child: Image.asset(
                 'assets/images/logo-App-A1.png',
                 height: 60,
