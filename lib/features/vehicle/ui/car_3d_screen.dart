@@ -247,7 +247,7 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
             ValueListenableBuilder<bool>(
               valueListenable: _game.modelReady,
               builder: (context, loaded, _) {
-                if (!loaded) return const SizedBox.shrink();
+                if (!loaded || _showHeadlightPanel || _showWheelsPanel || _showBrakesPanel) return const SizedBox.shrink();
                 return Positioned(
                   bottom: 30,
                   left: 0,
@@ -256,7 +256,7 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () => _game.resetRotation(),
                       icon: const Icon(Icons.refresh),
-                      label: const Text('Reset'),
+                      label: const Text('Reset position'),
                     ),
                   ),
                 );
@@ -300,14 +300,17 @@ class _ComponentPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final topSafe = max(MediaQuery.of(context).padding.top, 20.0);
     return Positioned(
-      left: 30,
-      right: 30,
-      top: 0,
-      bottom: 0,
+      left: 0,
+      right: 0,
+      top: topSafe + 95,
+      bottom: 20,
       child: Center(
-        child: AspectRatio(
-          aspectRatio: 0.75,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 380),
+          child: AspectRatio(
+            aspectRatio: 0.75,
           child: Container(
             decoration: BoxDecoration(
               color: const Color(0x77A0A0A0),
@@ -388,6 +391,7 @@ class _ComponentPanel extends StatelessWidget {
                 ],
               ),
             ),
+          ),
           ),
         ),
       ),
