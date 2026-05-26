@@ -20,7 +20,7 @@ final diagnosticReportControllerProvider =
 
 class DiagnosticReportController extends AsyncNotifier<void> {
   @override
-  Future<void> build() async {}
+  void build() {}
 
   Future<void> submitReport(String componentId, String description, String severity) async {
     state = const AsyncValue.loading();
