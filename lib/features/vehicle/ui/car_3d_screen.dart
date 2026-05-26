@@ -33,6 +33,7 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
 
   void _onTap(TapUpDetails details) {
     if (!_game.modelReady.value) return;
+    if (_showHeadlightPanel || _showWheelsPanel || _showBrakesPanel) return;
     final tap = details.localPosition;
 
     final headlightScreen = _game.headlightScreenPosition();
