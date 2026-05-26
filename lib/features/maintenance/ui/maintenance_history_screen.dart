@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../vehicle/domain/diagnostic_report.dart';
+import '../../vehicle/logic/vehicle_providers.dart';
 
-// ING: Maintenance history screen — static mock data, no backend yet.
-// PT: Ecrã do histórico de manutenção — dados estáticos, sem backend ainda.
-class MaintenanceHistoryScreen extends StatefulWidget {
+// ING: Maintenance history — Firebase diagnostic reports on top, mock service history below.
+// PT: Histórico de manutenção — relatórios Firebase no topo, histórico simulado em baixo.
+class MaintenanceHistoryScreen extends ConsumerStatefulWidget {
   const MaintenanceHistoryScreen({super.key});
 
   @override
-  State<MaintenanceHistoryScreen> createState() => _MaintenanceHistoryScreenState();
+  ConsumerState<MaintenanceHistoryScreen> createState() => _MaintenanceHistoryScreenState();
 }
 
-class _MaintenanceHistoryScreenState extends State<MaintenanceHistoryScreen> {
+class _MaintenanceHistoryScreenState extends ConsumerState<MaintenanceHistoryScreen> {
   _FilterStatus _selectedFilter = _FilterStatus.all;
 
   @override
   Widget build(BuildContext context) {
+    final reportsAsync = ref.watch(diagnosticReportsProvider);
+
     final filtered = _selectedFilter == _FilterStatus.all
         ? _mockRecords
         : _mockRecords.where((r) => r.status == _selectedFilter).toList();
@@ -22,7 +27,6 @@ class _MaintenanceHistoryScreenState extends State<MaintenanceHistoryScreen> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Background pink radial glows matching the app's auth/dashboard style.
           Positioned(
             top: -120,
             left: -120,
@@ -51,36 +55,107 @@ class _MaintenanceHistoryScreenState extends State<MaintenanceHistoryScreen> {
               ),
             ),
           ),
-
           SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _Header(),
-                _SummaryBanner(),
-                _FilterRow(
-                  selected: _selectedFilter,
-                  onChanged: (f) => setState(() => _selectedFilter = f),
-                ),
                 Expanded(
-                  child: filtered.isEmpty
-                      ? const Center(
-                          child: Text(
-                            'No records found.',
-                            style: TextStyle(color: Colors.black45),
-                          ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                          itemCount: filtered.length,
-                          itemBuilder: (context, i) => _RecordCard(record: filtered[i]),
+                  child: RefreshIndicator(
+                    color: Colors.pink,
+                    onRefresh: () => ref.refresh(diagnosticReportsProvider.future),
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                      children: [
+                        // ── Firebase diagnostic reports section ──
+                        _SectionHeader(
+                          icon: Icons.cloud_download_outlined,
+                          title: 'Diagnostic Reports',
+                          subtitle: 'Live data from vehicle sensors',
+                          color: Colors.pink,
                         ),
+                        const SizedBox(height: 8),
+                        reportsAsync.when(
+                          loading: () => const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 24),
+                            child: Center(child: CircularProgressIndicator(color: Colors.pink, strokeWidth: 2)),
+                          ),
+                          error: (e, _) => _ErrorCard(message: e.toString()),
+                          data: (reports) => reports.isEmpty
+                              ? const _EmptyCard(message: 'No diagnostic reports found.')
+                              : Column(
+                                  children: reports
+                                      .map((r) => _DiagnosticCard(report: r))
+                                      .toList(),
+                                ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // ── Mock service history section ──
+                        _SectionHeader(
+                          icon: Icons.build_outlined,
+                          title: 'Service History',
+                          subtitle: 'Scheduled maintenance records',
+                          color: Colors.blueGrey,
+                        ),
+                        const SizedBox(height: 8),
+                        _SummaryBanner(),
+                        const SizedBox(height: 8),
+                        _FilterRow(
+                          selected: _selectedFilter,
+                          onChanged: (f) => setState(() => _selectedFilter = f),
+                        ),
+                        const SizedBox(height: 8),
+                        if (filtered.isEmpty)
+                          const _EmptyCard(message: 'No records match this filter.')
+                        else
+                          ...filtered.map((r) => _RecordCard(record: r)),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+// ─── Section header ───────────────────────────────────────────────────────────
+
+class _SectionHeader extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+
+  const _SectionHeader({required this.icon, required this.title, required this.subtitle, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: color.withAlpha(20),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+        const SizedBox(width: 10),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87)),
+            Text(subtitle, style: const TextStyle(fontSize: 11, color: Colors.black45)),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -104,11 +179,7 @@ class _Header extends StatelessWidget {
             children: [
               Text(
                 'Maintenance History',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
               ),
               Text(
                 'Toyota Corolla — 2020',
@@ -141,47 +212,196 @@ class _Header extends StatelessWidget {
   }
 }
 
+// ─── Diagnostic card (Firebase data) ─────────────────────────────────────────
+
+class _DiagnosticCard extends StatelessWidget {
+  final DiagnosticReport report;
+  const _DiagnosticCard({required this.report});
+
+  @override
+  Widget build(BuildContext context) {
+    final severity = report.severity.toLowerCase();
+    final severityColor = switch (severity) {
+      'low' => Colors.green,
+      'medium' => Colors.orange,
+      'high' => Colors.red,
+      'critical' => Colors.red[900]!,
+      _ => Colors.grey,
+    };
+    final severityIcon = switch (severity) {
+      'low' => Icons.check_circle_outline,
+      'medium' => Icons.info_outline,
+      'high' => Icons.warning_amber_outlined,
+      'critical' => Icons.error_outline,
+      _ => Icons.help_outline,
+    };
+
+    final componentLabel = report.componentId
+        .replaceAll('_', ' ')
+        .split(' ')
+        .map((w) => w.isEmpty ? '' : '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
+        .join(' ');
+
+    final ts = report.timestamp;
+    final dateStr = '${ts.day.toString().padLeft(2, '0')} '
+        '${_monthName(ts.month)} ${ts.year}  '
+        '${ts.hour.toString().padLeft(2, '0')}:${ts.minute.toString().padLeft(2, '0')}';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: severityColor.withAlpha(60)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: severityColor.withAlpha(20),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(severityIcon, color: severityColor, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        componentLabel,
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: severityColor.withAlpha(20),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: severityColor.withAlpha(80)),
+                      ),
+                      child: Text(
+                        severity[0].toUpperCase() + severity.substring(1),
+                        style: TextStyle(fontSize: 11, color: severityColor, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(report.description, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.access_time, size: 12, color: Colors.black38),
+                    const SizedBox(width: 4),
+                    Text(dateStr, style: const TextStyle(fontSize: 11, color: Colors.black38)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _monthName(int m) => const [
+        '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      ][m];
+}
+
+// ─── Error / empty states ─────────────────────────────────────────────────────
+
+class _ErrorCard extends StatelessWidget {
+  final String message;
+  const _ErrorCard({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.red.withAlpha(10),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.red.withAlpha(60)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: Colors.red, size: 20),
+          const SizedBox(width: 10),
+          Expanded(child: Text(message, style: const TextStyle(fontSize: 12, color: Colors.red))),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyCard extends StatelessWidget {
+  final String message;
+  const _EmptyCard({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Center(child: Text(message, style: const TextStyle(color: Colors.black38, fontSize: 13))),
+    );
+  }
+}
+
 // ─── Summary banner ───────────────────────────────────────────────────────────
 
 class _SummaryBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.7),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _StatItem(label: 'Total Services', value: '${_mockRecords.length}', icon: Icons.build_circle_outlined, color: Colors.blue),
-            _VerticalDivider(),
-            _StatItem(
-              label: 'Due / Overdue',
-              value: '${_mockRecords.where((r) => r.status == _FilterStatus.dueSoon || r.status == _FilterStatus.overdue).length}',
-              icon: Icons.warning_amber_rounded,
-              color: Colors.orange,
-            ),
-            _VerticalDivider(),
-            _StatItem(
-              label: 'Total Spent',
-              value: '€${_mockRecords.fold<int>(0, (s, r) => s + r.costEur)}',
-              icon: Icons.euro_rounded,
-              color: Colors.green,
-            ),
-          ],
-        ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _StatItem(label: 'Total Services', value: '${_mockRecords.length}', icon: Icons.build_circle_outlined, color: Colors.blue),
+          _VerticalDivider(),
+          _StatItem(
+            label: 'Due / Overdue',
+            value: '${_mockRecords.where((r) => r.status == _FilterStatus.dueSoon || r.status == _FilterStatus.overdue).length}',
+            icon: Icons.warning_amber_rounded,
+            color: Colors.orange,
+          ),
+          _VerticalDivider(),
+          _StatItem(
+            label: 'Total Spent',
+            value: '€${_mockRecords.fold<int>(0, (s, r) => s + r.costEur)}',
+            icon: Icons.euro_rounded,
+            color: Colors.green,
+          ),
+        ],
       ),
     );
   }
@@ -226,10 +446,9 @@ class _FilterRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 42,
+      height: 40,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
         children: _FilterStatus.values
             .map((f) => _FilterChip(status: f, selected: f == selected, onTap: () => onChanged(f)))
             .toList(),
@@ -263,9 +482,7 @@ class _FilterChip extends StatelessWidget {
           decoration: BoxDecoration(
             color: selected ? Colors.pink : Colors.transparent,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: selected ? Colors.pink : Colors.black26,
-            ),
+            border: Border.all(color: selected ? Colors.pink : Colors.black26),
           ),
           child: Text(
             label,
@@ -281,7 +498,7 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-// ─── Record card ──────────────────────────────────────────────────────────────
+// ─── Service record card (mock data) ──────────────────────────────────────────
 
 class _RecordCard extends StatefulWidget {
   final _MaintenanceRecord record;
@@ -331,7 +548,6 @@ class _RecordCardState extends State<_RecordCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top row: icon + title + status badge
               Row(
                 children: [
                   Container(
@@ -348,18 +564,8 @@ class _RecordCardState extends State<_RecordCard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          r.serviceType,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        Text(
-                          r.serviceCenter,
-                          style: const TextStyle(fontSize: 12, color: Colors.black45),
-                        ),
+                        Text(r.serviceType, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87)),
+                        Text(r.serviceCenter, style: const TextStyle(fontSize: 12, color: Colors.black45)),
                       ],
                     ),
                   ),
@@ -370,25 +576,24 @@ class _RecordCardState extends State<_RecordCard> {
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: statusColor.withAlpha(80)),
                     ),
-                    child: Text(
-                      statusLabel,
-                      style: TextStyle(fontSize: 11, color: statusColor, fontWeight: FontWeight.w600),
-                    ),
+                    child: Text(statusLabel, style: TextStyle(fontSize: 11, color: statusColor, fontWeight: FontWeight.w600)),
                   ),
                 ],
               ),
               const SizedBox(height: 10),
-              // Quick info row
               Row(
                 children: [
                   _InfoPill(icon: Icons.calendar_today_outlined, label: r.date, color: Colors.blue),
                   const SizedBox(width: 8),
-                  _InfoPill(icon: Icons.speed_outlined, label: '${r.mileageKm.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')} km', color: Colors.purple),
+                  _InfoPill(
+                    icon: Icons.speed_outlined,
+                    label: '${r.mileageKm.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')} km',
+                    color: Colors.purple,
+                  ),
                   const SizedBox(width: 8),
                   _InfoPill(icon: Icons.euro_outlined, label: '${r.costEur}', color: Colors.green),
                 ],
               ),
-              // Expanded details
               if (_expanded) ...[
                 const SizedBox(height: 12),
                 const Divider(height: 1, color: Colors.black12),
@@ -405,14 +610,10 @@ class _RecordCardState extends State<_RecordCard> {
                       color: Colors.black.withAlpha(6),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
-                      r.notes,
-                      style: const TextStyle(fontSize: 12, color: Colors.black54, fontStyle: FontStyle.italic),
-                    ),
+                    child: Text(r.notes, style: const TextStyle(fontSize: 12, color: Colors.black54, fontStyle: FontStyle.italic)),
                   ),
                 ],
               ],
-              // Expand/collapse indicator
               Align(
                 alignment: Alignment.centerRight,
                 child: Icon(
@@ -469,13 +670,8 @@ class _DetailRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 110,
-            child: Text(label, style: const TextStyle(fontSize: 12, color: Colors.black45)),
-          ),
-          Expanded(
-            child: Text(value, style: const TextStyle(fontSize: 12, color: Colors.black87, fontWeight: FontWeight.w500)),
-          ),
+          SizedBox(width: 110, child: Text(label, style: const TextStyle(fontSize: 12, color: Colors.black45))),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 12, color: Colors.black87, fontWeight: FontWeight.w500))),
         ],
       ),
     );

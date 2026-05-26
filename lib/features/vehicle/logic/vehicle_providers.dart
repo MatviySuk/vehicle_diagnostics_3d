@@ -8,6 +8,11 @@ final vehicleStatusProvider = FutureProvider.autoDispose<VehicleStatus>((ref) {
   return repository.getVehicleStatus();
 });
 
+final diagnosticReportsProvider = FutureProvider.autoDispose<List<DiagnosticReport>>((ref) {
+  final repository = ref.watch(vehicleRepositoryProvider);
+  return repository.getDiagnosticReports();
+});
+
 final diagnosticReportControllerProvider =
     AsyncNotifierProvider<DiagnosticReportController, void>(() {
   return DiagnosticReportController();
