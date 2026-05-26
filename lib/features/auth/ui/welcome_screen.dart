@@ -116,17 +116,20 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
           // PT: Manchas de fundo atrás de todo o conteúdo.
           const _GradientBlobs(),
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Spacer(flex: 2),
-                  const SizedBox(height: 28),
-                  Image.asset(
-                    'assets/images/logo-App-A1.png',
-                    height: 40,
-                  ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Spacer(flex: 2),
+                      const SizedBox(height: 28),
+                      Image.asset(
+                        'assets/images/logo-App-A1.png',
+                        height: 40,
+                      ),
                   const SizedBox(height: 8),
                   const Text(
                     'Your car\'s health, at your fingertips',
@@ -197,8 +200,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                       ),
                     ),
                   ),
-                  const Spacer(),
-                ],
+                      const Spacer(),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
