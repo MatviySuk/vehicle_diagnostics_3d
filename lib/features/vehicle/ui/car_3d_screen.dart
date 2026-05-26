@@ -267,7 +267,7 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
             // PT: Logótipo — último na Stack, sempre por cima de tudo.
             Positioned(
               top: topSafe + 60,
-              left: isDesktop ? 8 : null,
+              left: isDesktop ? -65 : null,
               right: isDesktop ? null : (Platform.isIOS ? 1.0 : 16.0),
               child: Image.asset(
                 'assets/images/logo-App-A1.png',
