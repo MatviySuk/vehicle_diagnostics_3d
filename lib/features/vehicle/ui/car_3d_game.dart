@@ -24,10 +24,13 @@ class _PivotComponent extends Component3D {
 class SimpleGame3D extends FlameGame3D<World3D, CameraComponent3D>
     with PanDetector {
   late ModelComponent _car;
+  ModelComponent? _doorLeftOpenComponent;
+  bool _isDoorOpen = false;
   Model? _carModel;
   Model? headlightModel;
   Model? wheelsModel;
   Model? brakesModel;
+  Model? doorLeftOpenModel;
   Future<void>? _preloadFuture;
   double _rotationY = -0.64159;
   final modelReady = ValueNotifier<bool>(false);
@@ -52,6 +55,7 @@ class SimpleGame3D extends FlameGame3D<World3D, CameraComponent3D>
     headlightModel = await ModelParser.parse('models/headlight-front-right-1.gltf');
     wheelsModel = await ModelParser.parse('models/Untitled-wheels7.gltf');
     brakesModel = await ModelParser.parse('models/brakes-front-right-1.gltf');
+    doorLeftOpenModel = await ModelParser.parse('models/Untitled4b2.glb');
   }
 
   @override
@@ -142,15 +146,51 @@ class SimpleGame3D extends FlameGame3D<World3D, CameraComponent3D>
   Offset? brakesScreenPosition() =>
       _projectToScreen(Vector3(0.009, 0.004, 0.012));
 
+  void setNodeVisible(String name, {bool visible = true}) {
+    _car.hideNodeByName(name, hidden: !visible);
+  }
+
+  static const _leftDoorNodes = [
+    'Object_614',
+    'Object_616',
+    'Object_618',
+    'Object_620',
+  ];
+
+  void toggleLeftDoor({bool? open}) {
+    _isDoorOpen = open ?? !_isDoorOpen;
+
+    for (final name in _leftDoorNodes) {
+      _car.hideNodeByName(name, hidden: _isDoorOpen);
+    }
+
+    if (_isDoorOpen) {
+      _doorLeftOpenComponent?.removeFromParent();
+      _doorLeftOpenComponent = ModelComponent(
+        model: doorLeftOpenModel!,
+        rotation: Quaternion.axisAngle(Vector3(0, 1, 0), _rotationY),
+        position: Vector3(0, 1, 0),
+        scale: Vector3.all(15.0),
+      );
+      world.add(_doorLeftOpenComponent!);
+    } else {
+      _doorLeftOpenComponent?.removeFromParent();
+    }
+  }
+
   void resetRotation() {
     _rotationY = -0.64159;
-    _car.rotation.setFrom(Quaternion.axisAngle(Vector3(0, 1, 0), _rotationY));
+    final q = Quaternion.axisAngle(Vector3(0, 1, 0), _rotationY);
+    _car.rotation.setFrom(q);
+    _doorLeftOpenComponent?.rotation.setFrom(q);
   }
 
   @override
   void onPanUpdate(DragUpdateInfo info) {
     _rotationY += info.delta.global.x * 0.01;
-    _car.rotation.setFrom(Quaternion.axisAngle(Vector3(0, 1, 0), _rotationY));
+    final q = Quaternion.axisAngle(Vector3(0, 1, 0), _rotationY);
+    _car.rotation.setFrom(q);
+    _doorLeftOpenComponent?.rotation.setFrom(q);
   }
 }
 
