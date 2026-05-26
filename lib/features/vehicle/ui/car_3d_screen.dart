@@ -20,6 +20,21 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
   void initState() {
     super.initState();
     _game = ref.read(car3dGameProvider);
+    _game.modelReady.addListener(_applyDoorState);
+  }
+
+  @override
+  void dispose() {
+    _game.modelReady.removeListener(_applyDoorState);
+    super.dispose();
+  }
+
+  void _applyDoorState() {
+    if (!_game.modelReady.value) return;
+    final cached = ref.read(cachedVehicleStatusProvider).valueOrNull;
+    if (cached != null) {
+      _game.toggleLeftDoor(open: !cached.status.isDoorsLocked);
+    }
   }
 
   bool _showHeadlightPanel = false;
@@ -68,6 +83,13 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(cachedVehicleStatusProvider, (_, next) {
+      final cached = next.valueOrNull;
+      if (cached != null && _game.modelReady.value) {
+        _game.toggleLeftDoor(open: !cached.status.isDoorsLocked);
+      }
+    });
+
     final vehicleAsync = ref.watch(cachedVehicleStatusProvider);
 
     final minPressure = vehicleAsync.whenOrNull(
