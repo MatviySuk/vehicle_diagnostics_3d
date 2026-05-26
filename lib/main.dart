@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/device/device_id_provider.dart';
@@ -7,6 +8,7 @@ import 'features/vehicle/ui/car_3d_game.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   final sharedPreferences = await SharedPreferences.getInstance();
   final game = SimpleGame3D();
   // ING: Parse models in the background while the app boots.
