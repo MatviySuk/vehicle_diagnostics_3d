@@ -95,7 +95,7 @@ class DashboardScreen extends ConsumerWidget {
           // PT: Aviso offline — mostrado quando os dados vêm da cache local.
           if (vehicleStatusAsync.whenOrNull(data: (c) => c.fromCache) == true)
             Positioned(
-              bottom: 80,
+              bottom: isDesktop ? 60 : 80,
               left: 24,
               right: 24,
               child: Container(

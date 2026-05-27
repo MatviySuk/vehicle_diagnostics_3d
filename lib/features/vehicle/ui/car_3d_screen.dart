@@ -216,7 +216,7 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
             // PT: Aviso offline — mostrado quando os dados vêm da cache local.
             if (isOffline && lastUpdated != null)
               Positioned(
-                bottom: 80,
+                bottom: isDesktop ? 60 : 80,
                 left: 24,
                 right: 24,
                 child: Container(
