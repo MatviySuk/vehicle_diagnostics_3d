@@ -67,4 +67,19 @@ class VehicleRepository {
       throw Exception('Failed to submit diagnostic report: ${e.message}');
     }
   }
+
+  Future<List<DiagnosticReport>> getDiagnosticReports() async {
+    try {
+      final response = await _dio.get('/v1/users/$_deviceId/vehicle/diagnostics.json');
+      if (response.data == null) return [];
+      final map = response.data as Map<String, dynamic>;
+      final reports = map.values
+          .map((v) => DiagnosticReport.fromJson(v as Map<String, dynamic>))
+          .toList()
+        ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      return reports;
+    } on DioException catch (e) {
+      throw Exception('Failed to fetch diagnostic reports: ${e.message}');
+    }
+  }
 }
