@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,6 +33,8 @@ Future<VehicleStatus?> _loadVehicleCache() async {
 // ING: Wraps vehicleStatusProvider with a SharedPreferences offline fallback.
 // PT: Envolve vehicleStatusProvider com fallback offline em SharedPreferences.
 final cachedVehicleStatusProvider = FutureProvider.autoDispose<CachedVehicleStatus>((ref) async {
+  final timer = Timer.periodic(const Duration(seconds: 20), (_) => ref.invalidate(vehicleStatusProvider));
+  ref.onDispose(timer.cancel);
   try {
     final status = await ref.watch(vehicleStatusProvider.future);
     await _saveVehicleCache(status);

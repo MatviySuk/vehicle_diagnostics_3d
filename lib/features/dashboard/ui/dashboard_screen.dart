@@ -91,6 +91,38 @@ class DashboardScreen extends ConsumerWidget {
             ),
           ),
 
+          // ING: Offline banner — shown when data comes from local cache.
+          // PT: Aviso offline — mostrado quando os dados vêm da cache local.
+          if (vehicleStatusAsync.whenOrNull(data: (c) => c.fromCache) == true)
+            Positioned(
+              bottom: 80,
+              left: 24,
+              right: 24,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withValues(alpha: 0.88),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.wifi_off, size: 14, color: Colors.black87),
+                    const SizedBox(width: 6),
+                    Text(
+                      () {
+                        final ts = vehicleStatusAsync.whenOrNull(data: (c) => c.status.lastUpdated);
+                        if (ts == null) return 'Offline';
+                        return 'Offline · Last sync: ${ts.hour.toString().padLeft(2, '0')}:${ts.minute.toString().padLeft(2, '0')}';
+                      }(),
+                      style: const TextStyle(color: Colors.black87, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
           // ING: Frosted glass top overlay — hides scrolling content behind the logo area.
           // PT: Overlay difuso no topo — esconde o conteúdo que passa por baixo do logótipo.
           Positioned(
