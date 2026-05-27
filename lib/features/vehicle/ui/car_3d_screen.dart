@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'car_3d_game.dart';
 import '../logic/vehicle_cache.dart';
+import '../logic/vehicle_providers.dart';
 import '../data/vehicle_repository.dart';
 
 class Car3DScreen extends ConsumerStatefulWidget {
@@ -87,7 +88,11 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
     if (doorScreen != null && (tap - doorScreen).distance < 50) {
       _game.toggleLeftDoor();
       final locked = !_game.isDoorOpen;
-      ref.read(vehicleRepositoryProvider).setDoorsLocked(locked);
+      // ING: Invalidate provider after PATCH so dashboard reflects the change immediately.
+      // PT: Invalida o provider após o PATCH para que o dashboard reflicta a mudança imediatamente.
+      ref.read(vehicleRepositoryProvider).setDoorsLocked(locked).then((_) {
+        ref.invalidate(vehicleStatusProvider);
+      });
     }
   }
 
