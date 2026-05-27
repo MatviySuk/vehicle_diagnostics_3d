@@ -8,6 +8,11 @@ final vehicleStatusProvider = FutureProvider.autoDispose<VehicleStatus>((ref) {
   return repository.getVehicleStatus();
 });
 
+final diagnosticReportsProvider = FutureProvider.autoDispose<List<DiagnosticReport>>((ref) {
+  final repository = ref.watch(vehicleRepositoryProvider);
+  return repository.getDiagnosticReports();
+});
+
 final diagnosticReportControllerProvider =
     AsyncNotifierProvider<DiagnosticReportController, void>(() {
   return DiagnosticReportController();
@@ -15,7 +20,7 @@ final diagnosticReportControllerProvider =
 
 class DiagnosticReportController extends AsyncNotifier<void> {
   @override
-  Future<void> build() async {}
+  void build() {}
 
   Future<void> submitReport(String componentId, String description, String severity) async {
     state = const AsyncValue.loading();
