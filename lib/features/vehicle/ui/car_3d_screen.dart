@@ -99,9 +99,17 @@ class _Car3DScreenState extends ConsumerState<Car3DScreen> {
   @override
   Widget build(BuildContext context) {
     ref.listen(cachedVehicleStatusProvider, (_, next) {
-      final cached = next.valueOrNull;
-      if (cached != null && _game.modelReady.value) {
-        _game.toggleLeftDoor(open: !cached.status.isDoorsLocked);
+      // ING: Only act on settled AsyncData — Riverpod 2.x AsyncLoading carries the
+      //      previous (stale) value in valueOrNull, which would incorrectly toggle
+      //      the door back during a provider refresh after a PATCH.
+      // PT: Só actua em AsyncData estabilizado — em Riverpod 2.x o AsyncLoading
+      //     devolve o valor anterior (stale) em valueOrNull, o que reverteria
+      //     incorrectamente a porta durante o refresh do provider após um PATCH.
+      if (next is! AsyncData<CachedVehicleStatus>) return;
+      if (!_game.modelReady.value) return;
+      final shouldBeOpen = !next.value.status.isDoorsLocked;
+      if (shouldBeOpen != _game.isDoorOpen) {
+        _game.toggleLeftDoor(open: shouldBeOpen);
       }
     });
 
