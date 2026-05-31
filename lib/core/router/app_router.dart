@@ -7,12 +7,10 @@ import '../../features/scanner/ui/qr_scanner_screen.dart';
 import '../../features/vehicle/ui/car_3d_screen.dart';
 import '../../features/vehicle/ui/component_detail_screen.dart';
 
-/**********
- * ING: Central router for the app. Always starts at /splash, which decides
- *      the next destination based on whether a session exists.
- * PT: Router central da app. Começa sempre em /splash, que decide
- *     o destino seguinte consoante a existência de sessão.
- ****/
+/// ING: Central router for the app. Always starts at /splash, which decides
+///      the next destination based on whether a session exists.
+/// PT: Router central da app. Começa sempre em /splash, que decide
+///     o destino seguinte consoante a existência de sessão.
 final appRouter = GoRouter(
   initialLocation: '/splash',
   routes: [
